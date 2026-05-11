@@ -11,56 +11,63 @@ jobs:
     runs-on: ubuntu-latest
     
     steps:
-      - name: 📥 سحب المستودع
+      - name: 📥 Checkout Repository
         uses: actions/checkout@v4
-      
-      - name: 🐍 إعداد Python
+
+      - name: 🐍 Setup Python
         uses: actions/setup-python@v5
         with:
           python-version: '3.12'
-      
-      - name: 🔧 توليد ملفات MNAENCA
+
+      - name: 🔧 Build MNAENCA Files
         run: python scraper.py
-      
-      - name: 📱 إعداد Node.js
+
+      - name: 📱 Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: 📱 Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '20'
-      
-      - name: 📦 تثبيت Capacitor و Android Platform
+
+      - name: 📱 Setup Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: 📦 Install Capacitor
         run: |
-          npm install -g @capacitor/cli @capacitor/core
-          npm install @capacitor/android
-      
-      - name: 🏗️ بناء مجلد www
+          npm install -g @capacitor/cli @capacitor/core @capacitor/android
+
+      - name: 🏗️ Prepare Web Assets
         run: |
           mkdir -p www
-          cp *.html www/
-          cp *.js www/
+          cp *.html www/ 2>/dev/null || true
+          cp *.js www/ 2>/dev/null || true
           cp -r resources www/ 2>/dev/null || true
-      
-      - name: ⚙️ إعداد Capacitor
+          echo "✅ Web assets prepared"
+
+      - name: ⚙️ Setup Capacitor
         run: |
-          npx cap add android
+          npx cap add android 2>/dev/null || echo "Android platform already exists"
           npx cap sync android
-      
-      - name: 📦 نسخ الأيقونة
-        run: |
-          mkdir -p android/app/src/main/res/mipmap-xxxhdpi
-          cp resources/icon.png android/app/src/main/res/mipmap-xxxhdpi/ic_launcher.png 2>/dev/null || echo "⚠️ استخدم أيقونة افتراضية"
-      
-      - name: 🔨 بناء APK
+          echo "✅ Capacitor configured"
+
+      - name: 🔨 Build APK
         run: |
           cd android
+          chmod +x gradlew
           ./gradlew assembleDebug
-      
-      - name: 📤 رفع APK
+          echo "✅ APK built successfully"
+
+      - name: 📤 Upload APK Artifact
         uses: actions/upload-artifact@v4
         with:
           name: MNAENCA-APK
           path: android/app/build/outputs/apk/debug/app-debug.apk
-      
-      - name: ✅ تأكيد النجاح
+
+      - name: ✅ Success Message
         run: |
           echo "╔════════════════════════════════════════════╗"
           echo "║  📱 MNAENCA APK Build Complete!          ║"

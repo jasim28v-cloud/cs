@@ -1,19 +1,29 @@
 {
   "name": "universal-app",
   "version": "1.0.0",
-  "description": "High-Performance System v99",
+  "description": "High-Performance System v99 - Optimized for Render",
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
-    "build": "npm install"
+    "build": "npm ci --production",
+    "dev": "nodemon server.js"
   },
   "dependencies": {
     "express": "^4.18.2",
     "cors": "^2.8.5",
     "compression": "^1.7.4",
-    "axios": "^1.6.0"
+    "axios": "^1.6.0",
+    "dotenv": "^16.3.1",
+    "helmet": "^7.1.0"
   },
   "engines": {
-    "node": ">=14.0.0"
-  }
+    "node": ">=18.x"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/username/universal-app.git"
+  },
+  "keywords": ["express", "render", "api"],
+  "author": "Your Name",
+  "license": "MIT"
 }

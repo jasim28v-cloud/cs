@@ -8,38 +8,33 @@ const path = require('path');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// =============== Middleware ===============
-app.use(helmet());                          // أمان الرؤوس
-app.use(compression());                     // ضغط الاستجابة
-app.use(cors({
-  origin: process.env.ALLOWED_ORIGIN || '*',
-  methods: ['GET', 'POST']
-}));
-app.use(express.json({ limit: '1mb' }));    // منع payload ضخم
-app.use(express.static(path.join(__dirname, 'public'))); // مجلد منفصل للملفات الثابتة
+// Middleware
+app.use(helmet());
+app.use(compression());
+app.use(cors());
+app.use(express.json());
+app.use(express.static(path.join(__dirname, 'public')));
 
-// =============== Routes ===============
+// الصفحة الرئيسية
+app.get('/', (req, res) => {
+  res.send('🚀 الموقع يعمل بنجاح!');
+});
+
+// صفحة الحالة
 app.get('/status', (req, res) => {
-    res.status(200).json({ 
-        success: true,
-        message: 'System Online',
-        uptime: process.uptime(),
-        environment: process.env.NODE_ENV || 'development'
-    });
+  res.json({
+    success: true,
+    message: 'System Online',
+    uptime: process.uptime()
+  });
 });
 
-// معالجة 404 لأي مسار غير موجود
+// 404
 app.use((req, res) => {
-    res.status(404).json({ success: false, message: 'Route not found' });
+  res.status(404).json({ error: 'Not Found' });
 });
 
-// معالجة الأخطاء العامة
-app.use((err, req, res, next) => {
-    console.error(err.stack);
-    res.status(500).json({ success: false, message: 'Internal Server Error' });
-});
-
-// =============== Server ===============
+// Server
 app.listen(PORT, () => {
-    console.log(`✅ System active on port ${PORT} | ${new Date().toISOString()}`);
+  console.log(`Server running on port ${PORT}`);
 });
